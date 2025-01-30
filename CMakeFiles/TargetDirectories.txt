@@ -1,0 +1,5 @@
+C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/CMakeFiles/Power_Logging_Module_25.dir
+C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/CMakeFiles/edit_cache.dir
+C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/CMakeFiles/rebuild_cache.dir
+C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/cmake/stm32cubemx/CMakeFiles/edit_cache.dir
+C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/cmake/stm32cubemx/CMakeFiles/rebuild_cache.dir
