@@ -21,7 +21,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "plm.h"
+#include "adc_lib.h"
+#include "plm_error.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,7 +68,7 @@ UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+ADC_HandleTypeDef hadc1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,7 +88,20 @@ static void MX_USART1_UART_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM10_Init(void);
 /* USER CODE BEGIN PFP */
+// redirect printf to USART (STLink Virtual COM)
+// NOTE: output gets flushed at newline \n
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
 
+PUTCHAR_PROTOTYPE
+{
+  HAL_UART_Transmit(&huart4, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart4, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+  return ch;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -136,7 +152,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
-
+plm_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -591,7 +607,17 @@ static void MX_RTC_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN RTC_Init 2 */
+  // part of the bad solution
 
+  // put the old time and date back to what it used to be
+  if (HAL_RTC_SetTime(&hrtc, &old_time, RTC_FORMAT_BIN) != HAL_OK)
+  {
+	Error_Handler();
+  }
+  if (HAL_RTC_SetDate(&hrtc, &old_date, RTC_FORMAT_BIN) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE END RTC_Init 2 */
 
 }
@@ -627,7 +653,8 @@ static void MX_SDIO_SD_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN SDIO_Init 2 */
-
+  // CUBEMX BUG: INIT MUST BE IN 1 BIT MODE
+  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
   /* USER CODE END SDIO_Init 2 */
 
 }
