@@ -18,6 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
+#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,6 +69,12 @@ TIM_HandleTypeDef htim10;
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart1;
 
+osThreadId service_canHandle;
+osThreadId store_dataHandle;
+osThreadId heartbeatHandle;
+osThreadId simulate_dataHandle;
+osThreadId collect_dataHandle;
+osThreadId monitor_currentHandle;
 /* USER CODE BEGIN PV */
 ADC_HandleTypeDef hadc1;
 /* USER CODE END PV */
@@ -87,6 +95,13 @@ static void MX_UART4_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM10_Init(void);
+void plm_task_service_can(void const * argument);
+void plm_task_store_data(void const * argument);
+void plm_task_heartbeat(void const * argument);
+void plm_task_simulate_data(void const * argument);
+void plm_task_collect_data(void const * argument);
+void plm_task_monitor_current(void const * argument);
+
 /* USER CODE BEGIN PFP */
 // redirect printf to USART (STLink Virtual COM)
 // NOTE: output gets flushed at newline \n
@@ -151,9 +166,60 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   MX_TIM10_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 plm_init();
   /* USER CODE END 2 */
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of service_can */
+  osThreadDef(service_can, plm_task_service_can, osPriorityNormal, 0, 1024);
+  service_canHandle = osThreadCreate(osThread(service_can), NULL);
+
+  /* definition and creation of store_data */
+  osThreadDef(store_data, plm_task_store_data, osPriorityNormal, 0, 1024);
+  store_dataHandle = osThreadCreate(osThread(store_data), NULL);
+
+  /* definition and creation of heartbeat */
+  osThreadDef(heartbeat, plm_task_heartbeat, osPriorityLow, 0, 512);
+  heartbeatHandle = osThreadCreate(osThread(heartbeat), NULL);
+
+  /* definition and creation of simulate_data */
+  osThreadDef(simulate_data, plm_task_simulate_data, osPriorityLow, 0, 1024);
+  simulate_dataHandle = osThreadCreate(osThread(simulate_data), NULL);
+
+  /* definition and creation of collect_data */
+  osThreadDef(collect_data, plm_task_collect_data, osPriorityNormal, 0, 1024);
+  collect_dataHandle = osThreadCreate(osThread(collect_data), NULL);
+
+  /* definition and creation of monitor_current */
+  osThreadDef(monitor_current, plm_task_monitor_current, osPriorityNormal, 0, 1024);
+  monitor_currentHandle = osThreadCreate(osThread(monitor_current), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -644,14 +710,6 @@ static void MX_SDIO_SD_Init(void)
   hsd.Init.BusWide = SDIO_BUS_WIDE_4B;
   hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
   hsd.Init.ClockDiv = 0;
-  if (HAL_SD_Init(&hsd) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B) != HAL_OK)
-  {
-    Error_Handler();
-  }
   /* USER CODE BEGIN SDIO_Init 2 */
   // CUBEMX BUG: INIT MUST BE IN 1 BIT MODE
   hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
@@ -861,7 +919,7 @@ static void MX_GPIO_Init(void)
                           |GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8|GPIO_PIN_15, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
@@ -905,12 +963,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PA8 PA15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_15;
+  /*Configure GPIO pin : PA8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SDIO_CD_Pin */
+  GPIO_InitStruct.Pin = SDIO_CD_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(SDIO_CD_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PD4 PD5 PD6 */
   GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
@@ -926,6 +990,114 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_plm_task_service_can */
+/**
+  * @brief  Function implementing the service_can thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_plm_task_service_can */
+void plm_task_service_can(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_plm_task_store_data */
+/**
+* @brief Function implementing the store_data thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_plm_task_store_data */
+void plm_task_store_data(void const * argument)
+{
+  /* USER CODE BEGIN plm_task_store_data */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END plm_task_store_data */
+}
+
+/* USER CODE BEGIN Header_plm_task_heartbeat */
+/**
+* @brief Function implementing the heartbeat thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_plm_task_heartbeat */
+void plm_task_heartbeat(void const * argument)
+{
+  /* USER CODE BEGIN plm_task_heartbeat */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END plm_task_heartbeat */
+}
+
+/* USER CODE BEGIN Header_plm_task_simulate_data */
+/**
+* @brief Function implementing the simulate_data thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_plm_task_simulate_data */
+void plm_task_simulate_data(void const * argument)
+{
+  /* USER CODE BEGIN plm_task_simulate_data */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END plm_task_simulate_data */
+}
+
+/* USER CODE BEGIN Header_plm_task_collect_data */
+/**
+* @brief Function implementing the collect_data thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_plm_task_collect_data */
+void plm_task_collect_data(void const * argument)
+{
+  /* USER CODE BEGIN plm_task_collect_data */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END plm_task_collect_data */
+}
+
+/* USER CODE BEGIN Header_plm_task_monitor_current */
+/**
+* @brief Function implementing the monitor_current thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_plm_task_monitor_current */
+void plm_task_monitor_current(void const * argument)
+{
+  /* USER CODE BEGIN plm_task_monitor_current */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END plm_task_monitor_current */
+}
 
 /**
   * @brief  Period elapsed callback in non blocking mode
