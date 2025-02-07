@@ -1,7 +1,7 @@
 /*
  * plm.c
  *
- *  Created on: Jan 13, 2023
+ *  Created on: Feb 6, 2025
  *      Author: jonathan
  */
 
@@ -36,6 +36,7 @@ extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc3;
 
 extern PLM_DBL_BUFFER SD_DB;
+extern PLM_DBL_BUFFER RADIO_DB;
 
 extern I2C_HandleTypeDef hi2c2;
 extern SD_HandleTypeDef hsd;
@@ -65,8 +66,7 @@ void plm_init(void) {
     // GopherCAN
     err |= init_can(&hcan1, GCAN0); //24 GopherCan
     err |= init_can(&hcan2, GCAN1); //24 GopherCan
-    //err |= init_can(GCAN0, &hcan1, PLM_ID, BXTYPE_MASTER); //23 GopherCan
-    //err |= init_can(GCAN1, &hcan2, PLM_ID, BXTYPE_MASTER); //23 GopherCan
+
 
     if (err) {
         plm_err_set(PLM_ERR_INIT);
@@ -105,6 +105,7 @@ void plm_heartbeat(void) {
 
     static uint32_t last_blink = 0;
     if (tick - last_blink >= PLM_DELAY_HEARTBEAT_BLINK) {
+
 #ifdef PLM_DEV_MODE
         printf("PLM (%lu): ⚡\n", tick);
 #endif
@@ -124,22 +125,6 @@ void plm_service_can(void) {
 	static U32 last_message_send = 0;
 	if (HAL_GetTick() - last_message_send >= CAN_MESSAGE_FORWARD_INTERVAL_ms)
 	{
-#ifdef GO4_23c
-		// send rear sensor hubs and other parameters on other buses for display
-		send_group(0x10);
-		send_group(0x401);
-#endif
-#ifdef GO4_23e
-		send_group(0x3B0);
-		send_group(0x3C0);
-		send_group(0x3C1);
-		send_group(0x3C2);
-		send_group(0x3A7);
-		send_group(0x396);
-		send_group(0x386);
-		send_group(0x003);
-        send_group(0x550);
-#endif
 		last_message_send = HAL_GetTick();
 	}
 
@@ -157,10 +142,16 @@ void GCAN_RxMsgPendingCallback(CAN_HandleTypeDef* hcan, U32 rx_mailbox) {
     service_can_rx_hardware(hcan, rx_mailbox);
 }
 
+
+
+
+//need to update this for tm_collect_data
 void plm_collect_data(void) {
     static uint32_t sd_last_log[NUM_OF_PARAMETERS] = {0};
+    static uint32_t radio_last_tx[NUM_OF_PARAMETERS] = {0};
     uint8_t voltage_ok = plmVbatVoltage_V.data >= MIN_VBAT_VOLTAGE_V && plm5VVoltage_V.data >= MIN_5V_VOLTAGE_V;
     uint8_t usb_connected = HAL_GPIO_ReadPin(HS_VBUS_SNS_GPIO_Port, HS_VBUS_SNS_Pin);
+
 #ifdef PLM_DEV_MODE
     voltage_ok = 1;
 #endif
@@ -294,9 +285,6 @@ void plm_monitor_current(void) {
     osThreadTerminate(osThreadGetId());
 #endif
 
-#ifdef GO4_23c
-	//plm_cooling_control();
-#endif
     for (size_t i = 0; i < NUM_OF_CHANNELS; i++) {
         PLM_POWER_CHANNEL* channel = POWER_CHANNELS[i];
         plm_power_update_channel(channel);
@@ -344,4 +332,51 @@ void plm_monitor_current(void) {
     }
 
     osDelay(PLM_TASK_DELAY_POWER);
+}
+
+void tm_heartbeat() {
+	uint32_t tick = HAL_GetTick();
+	static uint32_t last_can_calc = 0;
+
+	HAL_GPIO_TogglePin(LED_HEARTBEAT_GPIO_Port, LED_HEARTBEAT_Pin);
+
+	// print time stamp
+	RTC_TimeTypeDef time;
+	RTC_DateTypeDef date;
+	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
+	HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
+	printf("20%u-%02u-%02u-%02u-%02u-%02u\n", date.Year, date.Month, date.Date, time.Hours, time.Minutes, time.Seconds);
+
+	// update logging metrics
+	tm_SDBufferFill_percent.info.last_rx = tick;
+	tm_RadioBufferFill_percent.info.last_rx = tick;
+	tm_SDBytesTransferred_bytes.info.last_rx = tick;
+	tm_RadioBytesTransferred_bytes.info.last_rx = tick;
+	tm_SDPacketsDropped_ul.info.last_rx = tick;
+	tm_RadioPacketsDropped_ul.info.last_rx = tick;
+
+	// average coin cell voltage samples
+	uint32_t adc_total = 0;
+	for (size_t i = 0; i < ADC_VBAT_BUF_SIZE; i++) {
+		adc_total += ADC_VBAT_BUF[i];
+	}
+	float adc_avg = (float) adc_total / ADC_VBAT_BUF_SIZE;
+	tm_CoinBattery_V.data = adc_avg / 4096.0f * 3.3f;
+	tm_CoinBattery_V.info.last_rx = tick;
+
+	// estimate CAN utilization
+	// assumes 1Mbps bus
+	// assumes each frame is 44 + 8N (data bytes) + 3 (inter-frame) = 111 bits
+	// assumes every frame has 8 bytes of data (worst case)
+	// ignores bit stuffing
+	float sec_since_last_update = (HAL_GetTick() - last_can_calc) / 1000.0f;
+	float hcan1_util = hcan1_rx_count * 111.0f / sec_since_last_update / 1e6;
+	float hcan2_util = hcan2_rx_count * 111.0f / sec_since_last_update / 1e6;
+	tm_CAN1Util_percent.data = hcan1_util * 100.0f;
+	tm_CAN2Util_percent.data = hcan2_util * 100.0f;
+	tm_CAN1Util_percent.info.last_rx = tick;
+	tm_CAN2Util_percent.info.last_rx = tick;
+	last_can_calc = HAL_GetTick();
+
+	osDelay(TM_DELAY_HEARTBEAT);
 }

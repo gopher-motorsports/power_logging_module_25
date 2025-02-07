@@ -1,7 +1,7 @@
 /*
  * plm_data.c
  *
- *  Created on: Mar 20, 2023
+ *  Created on: Feb 6, 2025
  *      Author: jonathan
  */
 
@@ -29,6 +29,26 @@ PLM_DBL_BUFFER SD_DB = {
     .tx_cplt = 1
 };
 
+// RADIO DOUBLE BUFFER
+static uint8_t b3[PLM_SD_BUFFER_SIZE];
+static PLM_BUFFER buffer3 = {
+    .bytes = b3,
+    .size = PLM_RADIO_BUFFER_SIZE,
+    .fill = 0
+};
+
+static uint8_t b4[PLM_SD_BUFFER_SIZE];
+static PLM_BUFFER buffer4 = {
+    .bytes = b4,
+    .size = PLM_RADIO_BUFFER_SIZE,
+    .fill = 0
+};
+
+PLM_DBL_BUFFER RADIO_DB = {
+    .buffers = { &buffer3, &buffer4 },
+    .write_index = 0,
+    .tx_cplt = 1
+};
 static void append_byte(PLM_BUFFER* buffer, uint8_t byte);
 
 PLM_RES plm_data_record_param(PLM_BUFFER* buffer, CAN_INFO_STRUCT* param) {

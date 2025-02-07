@@ -168,7 +168,7 @@ int main(void)
   MX_TIM10_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-plm_init();
+  plm_init();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -1004,7 +1004,7 @@ void plm_task_service_can(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    plm_service_can();
   }
   /* USER CODE END 5 */
 }
@@ -1022,7 +1022,7 @@ void plm_task_store_data(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    plm_store_data();
   }
   /* USER CODE END plm_task_store_data */
 }
@@ -1040,7 +1040,7 @@ void plm_task_heartbeat(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    plm_heartbeat();
   }
   /* USER CODE END plm_task_heartbeat */
 }
@@ -1058,7 +1058,7 @@ void plm_task_simulate_data(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    plm_simulate_data();
   }
   /* USER CODE END plm_task_simulate_data */
 }
@@ -1076,7 +1076,7 @@ void plm_task_collect_data(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    plm_collect_data();
   }
   /* USER CODE END plm_task_collect_data */
 }
@@ -1094,7 +1094,7 @@ void plm_task_monitor_current(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    plm_monitor_current();
   }
   /* USER CODE END plm_task_monitor_current */
 }

@@ -1,7 +1,7 @@
 /*
  * plm_sd.c
  *
- *  Created on: Jan 29, 2023
+ *  Created on: Feb 6, 2025
  *      Author: jonathan
  */
 
@@ -20,17 +20,9 @@ PLM_RES plm_sd_init(void) {
 #ifdef PLM_DEV_MODE
     printf("PLM (%lu): initializing SD card\n", HAL_GetTick());
 #endif
-
+    // checks that the card is inserted & initializes SD interface
     uint8_t sd_detected = HAL_GPIO_ReadPin(SD_SW_CD_GPIO_Port, SD_SW_CD_Pin) == GPIO_PIN_RESET;
     if (!sd_detected) return PLM_ERR_SD_INIT;
-
-    // checks that the card is inserted & initializes SD interface
-//    DSTATUS status = SD_Driver.disk_initialize(0);
-//    if (status == STA_NOINIT) return PLM_ERR_SD_INIT;
-
-    // empty SD driver message queue
-    // this is necessary to get a clean state after disconnecting USB
-    // SD_ResetMsgQueue(); I think this might be important but it is not defined. FIX THIS____________________
 
     // register file system
     FRESULT res = f_mount(&SDFatFS, SDPath, 1);
@@ -39,6 +31,7 @@ PLM_RES plm_sd_init(void) {
     // generate filename
     RTC_TimeTypeDef time;
     RTC_DateTypeDef date;
+    // must call GetTime() before GetDate() according to HAL docs
     HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
     char filename[] = "PLM_YYYY-MM-DD-hh-mm-ss.gdat";
@@ -69,7 +62,7 @@ void plm_sd_deinit(void) {
 
     // close file and unregister file system
     f_close(&SDFile);
-    //f_mount(NULL, SDPath, 0);
+    f_mount(NULL, SDPath, 0);
 }
 
 PLM_RES plm_sd_write(uint8_t* buffer, uint16_t size) {

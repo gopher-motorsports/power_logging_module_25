@@ -19,6 +19,7 @@
 #define PLM_SD_BUFFER_SIZE 5000
 #define PLM_XB_BUFFER_SIZE 0
 
+#define PLM_RADIO_BUFFER_SIZE 10000
 typedef struct {
     uint8_t* bytes;
     size_t size;
