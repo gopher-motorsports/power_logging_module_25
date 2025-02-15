@@ -63,6 +63,24 @@ void GPIO_extension_overcurrent_LED(int state) {
 	HAL_I2C_Master_Transmit(&hi2c2, DEVICE_ADDRESS, pData , 2, 50); // if there is an error, check the timing value.
 }
 
+void GPIO_Extension_IMD_LIGHT_CTRL_LED(int state) {
+	if (imdFault_state.data == 1){
+		HAL_GPIO_WritePin(IMD_LIGHT_CTRL_Port, IMD_LIGHT_CTRL_Pin, 1);
+	}
+	else{
+		HAL_GPIO_WritePin(IMD_LIGHT_CTRL_Port, IMD_LIGHT_CTRL_Pin, 0);
+	}
+}
+
+void GPIO_Extension_BMS_LIGHT_CTRL_LED(int state) {
+	if (amsFault_state.data == 1){
+		HAL_GPIO_WritePin(BMS_LIGHT_CTRL_Port, BMS_LIGHT_CTRL_Pin, 1);
+	}
+	else{
+		HAL_GPIO_WritePin(BMS_LIGHT_CTRL_Port, BMS_LIGHT_CTRL_Pin, 0);
+	}
+}
+
 void GPIO_Extension_toggle(int pin) {
 	pData[0] = OUTPUT_PORT_REGISTER;
 	if (pin == 0) {
