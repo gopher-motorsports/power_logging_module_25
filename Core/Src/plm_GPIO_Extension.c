@@ -64,7 +64,7 @@ void GPIO_extension_overcurrent_LED(int state) {
 }
 
 void GPIO_Extension_IMD_LIGHT_CTRL_LED(int state) {
-	if (imdFault_state.data == 1){
+	if (state == 1){
 		HAL_GPIO_WritePin(IMD_LIGHT_CTRL_Port, IMD_LIGHT_CTRL_Pin, 1);
 	}
 	else{
@@ -73,7 +73,7 @@ void GPIO_Extension_IMD_LIGHT_CTRL_LED(int state) {
 }
 
 void GPIO_Extension_BMS_LIGHT_CTRL_LED(int state) {
-	if (amsFault_state.data == 1){
+	if (state == 1){
 		HAL_GPIO_WritePin(BMS_LIGHT_CTRL_Port, BMS_LIGHT_CTRL_Pin, 1);
 	}
 	else{
