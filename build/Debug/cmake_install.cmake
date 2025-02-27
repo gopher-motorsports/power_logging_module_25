@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25
+# Install script for directory: C:/Users/sabri/Projects/FSAE/Go4-25e/Power_Logging_Module_25
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/build/Debug/cmake/stm32cubemx/cmake_install.cmake")
+  include("C:/Users/sabri/Projects/FSAE/Go4-25e/Power_Logging_Module_25/build/Debug/cmake/stm32cubemx/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/build/Debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/sabri/Projects/FSAE/Go4-25e/Power_Logging_Module_25/build/Debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

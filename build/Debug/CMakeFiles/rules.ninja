@@ -35,7 +35,7 @@ rule C_COMPILER__Power_Logging_Module_25_unscanned_Debug
 # Rule for linking C executable.
 
 rule C_EXECUTABLE_LINKER__Power_Logging_Module_25_Debug
-  command = C:\Windows\system32\cmd.exe /C "$PRE_LINK && C:\ST\STM32CubeCLT_1.16.0\GNU-tools-for-STM32\bin\arm-none-eabi-gcc.exe $FLAGS -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -T "C:/Users/moham/OneDrive/Desktop/CODE/power_logging_module_25/STM32F446VETx_FLASH.ld" --specs=nano.specs -Wl,-Map=Power_Logging_Module_25.map -Wl,--gc-sections -Wl,--start-group -lc -lm -Wl,--end-group -Wl,--print-memory-usage $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
+  command = C:\Windows\system32\cmd.exe /C "$PRE_LINK && C:\ST\STM32CubeCLT_1.16.0\GNU-tools-for-STM32\bin\arm-none-eabi-gcc.exe $FLAGS -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard  -T "C:/Users/sabri/Projects/FSAE/Go4-25e/Power_Logging_Module_25/STM32F446VETx_FLASH.ld" --specs=nano.specs -Wl,-Map=Power_Logging_Module_25.map -Wl,--gc-sections -Wl,--start-group -lc -lm -Wl,--end-group -Wl,--print-memory-usage $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking C executable $TARGET_FILE
   restat = $RESTAT
 
@@ -52,7 +52,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\ST\STM32CubeCLT_1.16.0\CMake\bin\cmake.exe --regenerate-during-build -SC:\Users\moham\OneDrive\Desktop\CODE\power_logging_module_25 -BC:\Users\moham\OneDrive\Desktop\CODE\power_logging_module_25\build\Debug
+  command = C:\ST\STM32CubeCLT_1.16.0\CMake\bin\cmake.exe --regenerate-during-build -SC:\Users\sabri\Projects\FSAE\Go4-25e\Power_Logging_Module_25 -BC:\Users\sabri\Projects\FSAE\Go4-25e\Power_Logging_Module_25\build\Debug
   description = Re-running CMake...
   generator = 1
 
