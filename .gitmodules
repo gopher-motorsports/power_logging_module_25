@@ -1,0 +1,6 @@
+[submodule "Gopher_Sense"]
+	path = Gopher_Sense
+	url = https://github.com/gopher-motorsports/Gopher_Sense.git
+[submodule "gophercan-lib"]
+	path = gophercan-lib
+	url = https://github.com/gopher-motorsports/gophercan-lib.git

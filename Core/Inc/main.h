@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2025 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -57,16 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define RFD_GPIO0_Pin GPIO_PIN_2
-#define RFD_GPIO0_GPIO_Port GPIOE
-#define LED3_Pin GPIO_PIN_3
-#define LED3_GPIO_Port GPIOE
-#define LED4_Pin GPIO_PIN_4
-#define LED4_GPIO_Port GPIOE
-#define RFD_GPIO5_Pin GPIO_PIN_5
-#define RFD_GPIO5_GPIO_Port GPIOE
-#define RFD_GPIO6_Pin GPIO_PIN_6
-#define RFD_GPIO6_GPIO_Port GPIOE
+#define HS_VBUS_SNS_Pin GPIO_PIN_13
+#define HS_VBUS_SNS_GPIO_Port GPIOC
 #define ADC_5V_1_Pin GPIO_PIN_0
 #define ADC_5V_1_GPIO_Port GPIOC
 #define ADC_5V_2_Pin GPIO_PIN_1
@@ -95,58 +87,24 @@ void Error_Handler(void);
 #define EN_12V_0_GPIO_Port GPIOC
 #define ADC_5V_0_Pin GPIO_PIN_0
 #define ADC_5V_0_GPIO_Port GPIOB
-#define USB_RESET_Pin GPIO_PIN_7
-#define USB_RESET_GPIO_Port GPIOE
-#define SCD_MCU_1_Pin GPIO_PIN_8
-#define SCD_MCU_1_GPIO_Port GPIOE
-#define SDC_MCU_2_Pin GPIO_PIN_9
-#define SDC_MCU_2_GPIO_Port GPIOE
-#define SDC_MCU_3_Pin GPIO_PIN_10
-#define SDC_MCU_3_GPIO_Port GPIOE
-#define SDC_MCU_4_Pin GPIO_PIN_11
-#define SDC_MCU_4_GPIO_Port GPIOE
-#define EN_5V_0_Pin GPIO_PIN_12
-#define EN_5V_0_GPIO_Port GPIOE
-#define EN_5V_1_Pin GPIO_PIN_13
-#define EN_5V_1_GPIO_Port GPIOE
-#define EN_5V_2_Pin GPIO_PIN_14
-#define EN_5V_2_GPIO_Port GPIOE
-#define LED5_Pin GPIO_PIN_15
-#define LED5_GPIO_Port GPIOE
-#define USB_BUS_SNS_Pin GPIO_PIN_12
-#define USB_BUS_SNS_GPIO_Port GPIOB
 #define EN_12V_2_Pin GPIO_PIN_14
 #define EN_12V_2_GPIO_Port GPIOB
 #define EN_12V_3_Pin GPIO_PIN_15
 #define EN_12V_3_GPIO_Port GPIOB
-#define LED2_Pin GPIO_PIN_14
-#define LED2_GPIO_Port GPIOD
-#define LED0_Pin GPIO_PIN_15
-#define LED0_GPIO_Port GPIOD
 #define EN_12V_4_Pin GPIO_PIN_6
 #define EN_12V_4_GPIO_Port GPIOC
 #define EN_12V_5_Pin GPIO_PIN_7
 #define EN_12V_5_GPIO_Port GPIOC
 #define EN_12V_6_Pin GPIO_PIN_8
 #define EN_12V_6_GPIO_Port GPIOA
-#define SDIO_CD_Pin GPIO_PIN_15
-#define SDIO_CD_GPIO_Port GPIOA
-#define RFD_GPIO3_Pin GPIO_PIN_4
-#define RFD_GPIO3_GPIO_Port GPIOD
-#define RPD_GPIO2_Pin GPIO_PIN_5
-#define RPD_GPIO2_GPIO_Port GPIOD
-#define RFD_GPIO1_Pin GPIO_PIN_6
-#define RFD_GPIO1_GPIO_Port GPIOD
+#define LED_FAULT_Pin GPIO_PIN_10
+#define LED_FAULT_GPIO_Port GPIOA
+#define SD_SW_CD_Pin GPIO_PIN_15
+#define SD_SW_CD_GPIO_Port GPIOA
 #define EN_12V_1_Pin GPIO_PIN_4
 #define EN_12V_1_GPIO_Port GPIOB
-#define USB_RESETB6_Pin GPIO_PIN_6
-#define USB_RESETB6_GPIO_Port GPIOB
-#define LED1_Pin GPIO_PIN_7
-#define LED1_GPIO_Port GPIOB
-#define BMS_LIGHT_CTRL_Pin GPIO_PIN_0
-#define BMS_LIGHT_CTRL_GPIO_Port GPIOE
-#define IMD_LIGHT_CTRL_Pin GPIO_PIN_1
-#define IMD_LIGHT_CTRL_GPIO_Port GPIOE
+#define MEDIA_nRST_Pin GPIO_PIN_5
+#define MEDIA_nRST_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

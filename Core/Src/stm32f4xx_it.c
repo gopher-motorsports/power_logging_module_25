@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2025 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -22,6 +22,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "plm_error.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -85,7 +86,7 @@ void NMI_Handler(void)
 
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-   while (1)
+  while (1)
   {
   }
   /* USER CODE END NonMaskableInt_IRQn 1 */
@@ -97,7 +98,26 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
+	 // turn off heartbeat LED
+	 //HAL_GPIO_WritePin(LED_STATUS_GPIO_Port, LED_STATUS_Pin, GPIO_PIN_RESET);
 
+	 // reset timer
+	 TIM1->CNT = 0;
+
+	 // blink hardfault LED
+	 for (uint32_t i = 0; i < ERR_HARDFAULT_BLINKS; i++) {
+	     HAL_GPIO_TogglePin(LED_FAULT_GPIO_Port, LED_FAULT_Pin);
+	     // wait between blinks
+	     for (uint32_t j = 0; j < ERR_BLINK_PERIOD; j++) {
+	         // wait 1ms
+	         while (TIM1->CNT <= htim1.Init.Period/2) {}
+	         while (TIM1->CNT > htim1.Init.Period/2) {}
+	     }
+  }
+  HAL_GPIO_WritePin(LED_FAULT_GPIO_Port, LED_FAULT_Pin, GPIO_PIN_RESET);
+
+  // restart
+  NVIC_SystemReset();
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
