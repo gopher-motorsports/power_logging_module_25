@@ -9,11 +9,11 @@
 #include "main.h"
 #include "cmsis_os.h"
 
+//****
+//Water Pump
+//****
 // CAN SUPPORT: 20A
-// IC CHANNEL:  Fans
-// EXPECTED IC: 6A
-// EV CHANNEL:  Radiator Fan
-// EXPECTED EV: 4A
+// EXPECTED CURRENT: 4A
 PLM_POWER_CHANNEL ch_12v_0 = {
 	.parameter = &vbatChan0Current_A,
 	.enable_switch_port = EN_12V_0_GPIO_Port,
@@ -31,11 +31,11 @@ PLM_POWER_CHANNEL ch_12v_0 = {
 	.overcurrentcountparam = &Twelve_Volt_0_Overcurrent_Count
 };
 
+//****
+//Accumulator Fans
+//****
 // CAN SUPPORT: 20A
-// IC CHANNEL:  Water Pump
-// EXPECTED IC: 7.5A
-// EV CHANNEL:  Accumulator Fans
-// EXPECTED EV: 14A
+// EXPECTED CURRENT: 14A
 PLM_POWER_CHANNEL ch_12v_1 = {
 	.parameter = &vbatChan1Current_A,
 	.enable_switch_port = EN_12V_1_GPIO_Port,
@@ -53,11 +53,11 @@ PLM_POWER_CHANNEL ch_12v_1 = {
 	.overcurrentcountparam = &Twelve_Volt_1_Overcurrent_Count
 };
 
+//****
+//Radiator Fan
+//****
 // CAN SUPPORT: 20A
-// IC CHANNEL:  IGN and Fuel Pump
-// EXPECTED IC: 10A
-// EV CHANNEL:  Water Pump
-// EXPECTED EV: 14A
+// EXPECTED CURRENT: 14A
 PLM_POWER_CHANNEL ch_12v_2 = {
 	.parameter = &vbatChan2Current_A,
 	.enable_switch_port = EN_12V_2_GPIO_Port,
@@ -75,11 +75,11 @@ PLM_POWER_CHANNEL ch_12v_2 = {
 	.overcurrentcountparam = &Twelve_Volt_2_Overcurrent_Count
 };
 
+//****
+//Inverter, Lap Beacon, Inverter SDC Relay
+//****
 // CAN SUPPORT: 10A
-// IC CHANNEL:  ECU and Fuel INJ
-// EXPECTED IC: 4A
-// EV CHANNEL:  Inverter and Accumulator
-// EXPECTED EV: 4A
+// EXPECTED CURRENT: 4A
 PLM_POWER_CHANNEL ch_12v_3 = {
 	.parameter = &vbatChan3Current_A,
 	.enable_switch_port = EN_12V_3_GPIO_Port,
@@ -97,10 +97,10 @@ PLM_POWER_CHANNEL ch_12v_3 = {
 	.overcurrentcountparam = &Twelve_Volt_3_Overcurrent_Count
 };
 
+//****
+//Display, FVC, VectorNAV
+//****
 // CAN SUPPORT: 10A
-// IC CHANNEL:  Front VBat things
-// EXPECTED IC: 1A
-// EV CHANNEL:  Front VBat things
 // EXPECTED EV: 1A
 PLM_POWER_CHANNEL ch_12v_4 = {
 	.parameter = &vbatChan4Current_A,
@@ -119,11 +119,11 @@ PLM_POWER_CHANNEL ch_12v_4 = {
 	.overcurrentcountparam = &Twelve_Volt_4_Overcurrent_Count
 };
 
+//****
+//Accumulator Control, DRS, RVC
+//****
 // CAN SUPPORT: 10A
-// IC CHANNEL:  Rear VBat things
-// EXPECTED IC: 1A
-// EV CHANNEL:  Rear VBat things
-// EXPECTED EV: 1A
+// EXPECTED CURRENT: 1A
 PLM_POWER_CHANNEL ch_12v_5 = {
 	.parameter = &vbatChan5Current_A,
 	.enable_switch_port = EN_12V_5_GPIO_Port,
@@ -141,11 +141,11 @@ PLM_POWER_CHANNEL ch_12v_5 = {
 	.overcurrentcountparam = &Twelve_Volt_5_Overcurrent_Count
 };
 
+//****
+//AIRs
+//****
 // CAN SUPPORT: 10A
-// IC CHANNEL:  Mid VBat things
-// EXPECTED IC: 1A
-// EV CHANNEL:  Shut Down Circuit -> AIRs
-// EXPECTED EV: 1A
+// EXPECTED CURRENT: 1A
 PLM_POWER_CHANNEL ch_12v_6 = {
 	.parameter = &vbatChan6Current_A,
 	.enable_switch_port = EN_12V_6_GPIO_Port,
@@ -163,15 +163,15 @@ PLM_POWER_CHANNEL ch_12v_6 = {
 	.overcurrentcountparam = &Twelve_Volt_6_Overcurrent_Count
 };
 
+//****
+//RVC, PLM
+//****
 // CAN SUPPORT: 2A
-// IC CHANNEL:  TCM
-// EXPECTED IC: 0.5A
-// EV CHANNEL:  VCU
-// EXPECTED EV: 0.5A
+// EXPECTED CURRENT: 0.5A
 PLM_POWER_CHANNEL ch_5v_0 = {
     .parameter = &fiveVChan0Current_A,
-//    .enable_switch_port = EN_5V_0_GPIO_Port,
-//    .enable_switch_pin = EN_5V_0_Pin,
+	.enable_switch_port = EN_5V_0_GPIO_Port,
+   	.enable_switch_pin = EN_5V_0_Pin,
 	.enabled = 0,
 	.amp_max = 1.0f,
 	.ampsec_max = 0.5f,
@@ -187,15 +187,15 @@ PLM_POWER_CHANNEL ch_5v_0 = {
 	.overcurrentcountparam = &Five_Volt_0_Overcurrent_Count
 };
 
+//****
+//FVC, Steering Wheel
+//****
 // CAN SUPPORT: 2A
-// IC CHANNEL:  Rear 5V
-// EXPECTED IC: 0.5A
-// EV CHANNEL:  Rear 5V
-// EXPECTED EV: 0.5A
+// EXPECTED CURRENT: 0.5A
 PLM_POWER_CHANNEL ch_5v_1 = {
     .parameter = &fiveVChan1Current_A,
-//   .enable_switch_port = EN_5V_1_GPIO_Port,
-//    .enable_switch_pin = EN_5V_1_Pin,
+	.enable_switch_port = EN_5V_1_GPIO_Port,
+	.enable_switch_pin = EN_5V_1_Pin,
 	.enabled = 0,
 	.amp_max = 1.0f,
 	.ampsec_max = 0.5f,
@@ -205,21 +205,19 @@ PLM_POWER_CHANNEL ch_5v_1 = {
 	.last_update = 0,
 	.overcurrent_count = 0,
 	.max_overcurrent_count = 5,
-	.external_GPIO_on = 0b00010000,
-	.external_GPIO_off = 0b11101111,
 	.overcurrentparam = &Five_Volt_1_Overcurrent,
 	.overcurrentcountparam = &Five_Volt_1_Overcurrent_Count
 };
 
+//****
+//NONE
+//****
 // CAN SUPPORT: 2A
-// IC CHANNEL:  Front 5V
-// EXPECTED IC: 0.5A
-// EV CHANNEL:  Front 5V
-// EXPECTED EV: 0.5A
+// EXPECTED CURRENT: 0.5A
 PLM_POWER_CHANNEL ch_5v_2 = {
     .parameter = &fiveVChan2Current_A,
-//    .enable_switch_port = EN_5V_2_GPIO_Port,
-//    .enable_switch_pin = EN_5V_2_Pin,
+	.enable_switch_port = EN_5V_2_GPIO_Port,
+	.enable_switch_pin = EN_5V_2_Pin,
 	.enabled = 0,
 	.amp_max = 1.0f,
 	.ampsec_max = 0.5f,
@@ -229,33 +227,8 @@ PLM_POWER_CHANNEL ch_5v_2 = {
 	.last_update = 0,
 	.overcurrent_count = 0,
 	.max_overcurrent_count = 5,
-	.external_GPIO_on = 0b00100000,
-	.external_GPIO_off = 0b11011111,
 	.overcurrentparam = &Five_Volt_2_Overcurrent,
 	.overcurrentcountparam = &Five_Volt_2_Overcurrent_Count
-};
-
-// CAN SUPPORT: 2A
-// IC CHANNEL:  Aux 5V
-// EXPECTED IC: 0.5A
-// EV CHANNEL:  Aux 5V
-// EXPECTED EV: 0.5A
-PLM_POWER_CHANNEL ch_5v_3 = {
-    .parameter = &fiveVChan3Current_A,
-//    .enable_switch_port = EN_5V_3_GPIO_Port,
-//    .enable_switch_pin = EN_5V_3_Pin,
-	.enabled = 0,
-	.amp_max = 1.0f,
-	.ampsec_max = 0.5f,
-	.ampsec_sum = 0.0f,
-	.trip_time = 0,
-	.reset_delay_ms = 1000,
-	.last_update = 0,
-	.max_overcurrent_count = 5,
-	.external_GPIO_on = 0b01000000,
-	.external_GPIO_off = 0b10111111,
-	.overcurrentparam = &Five_Volt_3_Overcurrent,
-	.overcurrentcountparam = &Five_Volt_3_Overcurrent_Count
 };
 
 PLM_POWER_CHANNEL* POWER_CHANNELS[NUM_OF_CHANNELS] = {
