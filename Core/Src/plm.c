@@ -12,7 +12,6 @@
 #include "main.h"
 #include "GopherCAN.h"
 #include "gopher_sense.h"
-//#include "usb_device.h"
 #include "fatfs.h"
 #include "plm_sd.h"
 #include "plm_sim.h"
@@ -78,17 +77,12 @@ void plm_init(void) {
     gsense_init(&hcan1, &hadc1, &hadc2, &hadc3, 0, 0);
 
     //GPIO Expander
-    	GPIO_init();
+    //GPIO_init();
 
     // enable all power channel switches
     for (size_t i = 0; i < NUM_OF_CHANNELS; i++) {
         PLM_POWER_CHANNEL* channel = POWER_CHANNELS[i];
-        if (i <= 6) {
-        	HAL_GPIO_WritePin(channel->enable_switch_port, channel->enable_switch_pin, GPIO_PIN_SET);
-        }
-        else if (i > 6) {
-        	GPIO_Extension_On(channel->external_GPIO_on);
-        }
+        HAL_GPIO_WritePin(channel->enable_switch_port, channel->enable_switch_pin, GPIO_PIN_SET);
     }
 
     // we dont want to send parameters
